@@ -8,8 +8,7 @@ import authRouter from './routes/auth';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import morgan from 'morgan';
-
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 
 const port = env.PORT;
@@ -27,6 +26,12 @@ app.use('/api', userRoutes);
 app.use('/api', hotelRoutes);
 app.use('/api/auth', authRouter);
 
+if (process.env.NODE_ENV !== 'test') {
+  connDbAndStartServer();
+}
+
+console.log(process.env.NODE_ENV);
+
 async function connDbAndStartServer() {
   try {
     await mongoose.connect(env.MONGO_CONNECTION_STRING);
@@ -40,3 +45,5 @@ async function connDbAndStartServer() {
 }
 
 connDbAndStartServer();
+
+export default app;
