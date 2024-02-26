@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './layouts/Layout';
+import Register from './pages/Register';
+import SignIn from './pages/SignIn';
 
 const App = () => {
   return (
@@ -8,7 +10,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            <Layout children={}>
+            <Layout>
               <p>Home Page</p>
             </Layout>
           }
@@ -18,6 +20,23 @@ const App = () => {
           element={
             <Layout>
               <p>Search Page</p>
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <Layout>
+              <Register />
+            </Layout>
+          }
+        />
+        <Route
+          path="/sign-in"
+          element={
+            <Layout>
+              <SignIn />
             </Layout>
           }
         />
