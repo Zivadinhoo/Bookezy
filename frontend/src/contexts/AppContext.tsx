@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Toast from '../components/Toast';
 import { useQuery } from 'react-query';
 import * as apiClient from '../api-client';
@@ -11,29 +11,15 @@ type ToastMessage = {
 type AppContext = {
   showToast: (toastMessage: ToastMessage) => void;
   isLoggedIn: boolean;
-  setIsLoggedIn: (isLoogedIn: boolean) => void;
 };
 
 const AppContext = React.createContext<AppContext | undefined>(undefined);
 
 export const AppContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [toast, setToast] = useState<ToastMessage | undefined>(undefined);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  const { isError, isSuccess } = useQuery('validateToken', apiClient.validateToken, {
+  const { isError } = useQuery('validateToken', apiClient.validateToken, {
     retry: false,
-    onSuccess: () => setIsLoggedIn(true),
-    onError: () => setIsLoggedIn(false),
-    cacheTime: 0,
   });
-
-  useEffect(() => {
-    if (isSuccess) {
-      setIsLoggedIn(true);
-    } else if (isError) {
-      setIsLoggedIn(false);
-    }
-  }, [isError, isSuccess]);
 
   return (
     <AppContext.Provider
@@ -42,12 +28,11 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
           setToast(toastMessage);
         },
 
-        isLoggedIn,
-        setIsLoggedIn: (value: boolean) => setIsLoggedIn(value),
+        isLoggedIn: !isError,
       }}
     >
-      {children}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(undefined)} />}
+      {children}
     </AppContext.Provider>
   );
 };
@@ -55,9 +40,5 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
   const context = useContext(AppContext);
-
-  if (!context) {
-    throw new Error('useAppContext must be used within an AppContextProvider');
-  }
-  return context;
+  return context as AppContext;
 };
