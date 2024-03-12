@@ -1,26 +1,14 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
-import { loginUser, registerUser, validateToken, logout } from '../controllors/authController';
+import express from 'express';
+import { loginUser, validateToken, logout } from '../controllors/authController';
 import { loginValidators } from '../validators/authValidators';
+import { validateRequest } from '../middleware/validationMiddleware';
+import verifyToken from '../middleware/verifyTokenMiddleware';
 
 const router = express.Router();
 
-router.post('/register', registerUser);
+router.post('/login', loginValidators, validateRequest, loginUser);
 
-router.post(
-  '/login',
-  loginValidators,
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array() });
-    }
-    next();
-  },
-  loginUser
-);
-
-router.get('/validateToken', validateToken);
+router.get('/validate-token', verifyToken, validateToken);
 
 router.post('/logout', logout);
 
